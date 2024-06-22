@@ -1,23 +1,49 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState, useRef } from "react";
 
 function App() {
+  const [names, setNames] = useState([]);
+
+  const namesRef = useRef();
+
+  // // IDで検索する
+  // const handleSearchName = () => {
+  //   const params = namesRef.current.value;
+
+  //   if (params === "") {
+  //     fetch("http://localhost:80/api/customers")
+  //       .then((res) => res.json())
+  //       .then((json) => setNames(json))
+  //       .catch((error) => console.error("エラーです", error));
+  //   } else {
+  //     const query = new URLSearchParams(params);
+  //     console.log(query);
+  //     fetch(`http://localhost:80/api/customers?${query}`)
+  //       .then((res) => res.json())
+  //       .then((json) => setNames(json))
+  //       .catch((error) => console.error("エラーです", error));
+
+  //     namesRef.current.value = null;
+  //   }
+  // };
+
+  const handleSearchName = () => {
+    const params = namesRef.current.value;
+    const query = new URLSearchParams(params);
+    fetch(`http://localhost:80/api/customers/${query}`)
+      .then((res) => res.json())
+      .then((json) => setNames(json))
+      .then(console.log(names))
+      .catch((error) => console.error("エラーです", error));
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        {names.title}
+      </div>
+      <input type="text" ref={namesRef} />
+      <button onClick={handleSearchName}>名前追加</button>
     </div>
   );
 }
