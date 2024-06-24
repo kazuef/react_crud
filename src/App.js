@@ -1,69 +1,58 @@
 import './App.css';
-import DisplayAll from './DisplayAll';
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [names, setNames] = useState([]);
-  const [params, setParams] = useState([]);
-
-  const namesRef = useRef();
+  const [searchId, setSearctId] = useState([]);
+  const [name, setName] = useState([]);
+  const [error, setError] = useState([]);
 
   // 全件検索
-  const handleSearchAll = () => {
+  useEffect(() => {
     fetch("http://localhost:80/api/customers")
       .then((res) => res.json())
       .then((json) => setNames(json))
-      .catch((error) => console.error("エラーです", error));
+      .catch((error) => setError("エラーです"));
+  }, []);
 
-    setParams(null);
-  };
-  // // IDで検索する
-  // const handleSearchName = () => {
-  //   const params = namesRef.current.value;
-
-  //   if (params === "") {
-  //     fetch("http://localhost:80/api/customers")
-  //       .then((res) => res.json())
-  //       .then((json) => setNames(json))
-  //       .catch((error) => console.error("エラーです", error));
-  //   } else {
-  //     const query = new URLSearchParams(params);
-  //     console.log(query);
-  //     fetch(`http://localhost:80/api/customers?${query}`)
-  //       .then((res) => res.json())
-  //       .then((json) => setNames(json))
-  //       .catch((error) => console.error("エラーです", error));
-
-  //     namesRef.current.value = null;
-  //   }
-  // };
-
-  const handleSearchId = () => {
-    const params = namesRef.current.value;
-    const query = new URLSearchParams(params);
-
-    let tempArray = [];
-
-    fetch(`http://localhost:80/api/customers/${query}`)
+  // ID検索
+  const handleSearchId = async () => {
+    await fetch(`http://localhost:80/api/customers/${searchId}`)
       .then((res) => res.json())
-      .then((json) => tempArray=json)
-      .then((json) => console.log(json))
-      .then((json) => setNames(json))
-      .then(console.log(names))
-      .catch((error) => console.error("エラーです", error));
-
-    namesRef.current.value = null;
+      .then((json) => setName(json))
+      .catch((error) => {
+        setError("Customer no found");
+        setName(null);
+      }
+      );
   };
 
   return (
     <div className="App">
-      <input type="text" ref={namesRef} />
+      <h1>Customer Search</h1>
+      <div>
+        {error && <p>{error}</p>}
+        <ul>
+          {names.map(name => (
+            <li key={name.id}>{name.title}</li>
+          ))}
+        </ul>
+      </div>
+      <h2>Search Customer by ID</h2>
+      <input
+        type="text"
+        value={searchId}
+        onChange={(e) => setSearctId(e.target.value)}
+        placeholder="Enter customer ID"
+      />
       <button onClick={handleSearchId}>ID検索</button>
-      <button onClick={handleSearchAll}>全件検索</button>
-      {/* <div>
-        {names.title}
-      </div> */}
-      <DisplayAll names={names} params={params} />
+      {name && (
+        <div>
+          <h3>Customer Details</h3>
+          <p>ID: {name.id}</p>
+          <p>Title: {name.title}</p>
+        </div>
+      )}
     </div>
   );
 }
