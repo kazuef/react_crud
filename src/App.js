@@ -32,11 +32,11 @@ function App() {
       <h1>Customer Search</h1>
       <div>
         {error && <p>{error}</p>}
-        <ul>
+        <div>
           {names.map(name => (
-            <li key={name.id}>{name.title}</li>
+            <div key={name.id}>{name.title}</div>
           ))}
-        </ul>
+        </div>
       </div>
       <h2>Search Customer by ID</h2>
       <input
